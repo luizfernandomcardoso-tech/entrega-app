@@ -77,6 +77,11 @@
             margin-top: 10px;
         }
 
+        /* Span para marcar obrigatório */
+        label span {
+            color: #ff453a;
+        }
+
         input, textarea {
             width: 100%;
             background: #2c2c2e;
@@ -145,33 +150,36 @@
     </div>
 
     <div class="card">
-        <label>NOME DO CLIENTE *</label>
+        <label>NOME DO CLIENTE <span>*</span></label>
         <input type="text" id="nome">
 
-        <label>QUEM RECEBE (OPCIONAL)</label>
-        <input type="text" id="recebedor">
+        <label>TELEFONE <span>*</span></label>
+        <input type="tel" id="telefone" placeholder="Ex: (35) 99999-9999">
 
-        <label>RUA *</label>
+        <label>QUEM RECEBE <span>*</span></label>
+        <input type="text" id="recebedor" placeholder="Ex: Portaria / Próprio">
+
+        <label>RUA <span>*</span></label>
         <input type="text" id="rua">
 
         <div style="display:flex; gap:10px;">
             <div style="flex:1">
-                <label>NÚMERO *</label>
+                <label>NÚMERO <span>*</span></label>
                 <input type="text" id="numero">
             </div>
             <div style="flex:2">
-                <label>BAIRRO *</label>
+                <label>BAIRRO <span>*</span></label>
                 <input type="text" id="bairro">
             </div>
         </div>
 
-        <label>HORÁRIO *</label>
+        <label>HORÁRIO <span>*</span></label>
         <input type="text" id="horario" placeholder="Ex: Antes das 16h">
 
-        <label>FORMA DE PAGAMENTO *</label>
+        <label>FORMA DE PAGAMENTO <span>*</span></label>
         <input type="text" id="pagamento" placeholder="Ex: Pix, Dinheiro, Já Pago">
 
-        <label>OBSERVAÇÕES</label>
+        <label>OBSERVAÇÕES (OPCIONAL)</label>
         <textarea id="obs" rows="3"></textarea>
     </div>
 
@@ -252,18 +260,20 @@
                 return;
             }
 
+            // Coleta de dados
             const nome = document.getElementById('nome').value;
+            const telefone = document.getElementById('telefone').value;
+            const recebedor = document.getElementById('recebedor').value; // Agora obrigatório
             const rua = document.getElementById('rua').value;
             const numero = document.getElementById('numero').value;
             const bairro = document.getElementById('bairro').value;
             const horario = document.getElementById('horario').value;
-            const pagamento = document.getElementById('pagamento').value; // Novo
-            const recebedor = document.getElementById('recebedor').value;
+            const pagamento = document.getElementById('pagamento').value;
             const obs = document.getElementById('obs').value;
 
-            // Validação agora inclui Pagamento
-            if (!nome || !rua || !numero || !bairro || !horario || !pagamento) {
-                alert("⚠️ Preencha os campos obrigatórios (*)");
+            // Validação de OBRIGATÓRIOS (Todos menos obs)
+            if (!nome || !telefone || !recebedor || !rua || !numero || !bairro || !horario || !pagamento) {
+                alert("⚠️ Preencha todos os campos obrigatórios (marcados com *)");
                 return;
             }
 
@@ -271,9 +281,9 @@
             const escala = largura / imgProcessada.width;
             const alturaFoto = imgProcessada.height * escala;
             
-            // Aumentei o rodapé para caber o pagamento
-            let alturaRodape = 600; 
-            if (obs.length > 50) alturaRodape += 80;
+            // Altura do rodapé
+            let alturaRodape = 680; 
+            if (obs.length > 40) alturaRodape += 100;
 
             canvas.width = largura;
             canvas.height = alturaFoto + alturaRodape;
@@ -302,17 +312,21 @@
             ctx.fillText("CLIENTE: " + nome.toUpperCase(), pad, y);
             y += espacamentoLinha;
 
-            // 2. Recebedor
-            if(recebedor) {
-                ctx.font = fontePadrao;
-                ctx.fillStyle = "white"; 
-                ctx.fillText("RECEBEDOR: " + recebedor.toUpperCase(), pad, y);
-                y += espacamentoLinha;
-            }
-
-            // 3. Endereço
+            // 2. Telefone
             ctx.font = fontePadrao;
             ctx.fillStyle = "white";
+            ctx.fillText("TEL: " + telefone, pad, y);
+            y += espacamentoLinha;
+
+            // 3. Recebedor (Agora sempre exibe pois é obrigatório)
+            ctx.font = fontePadrao;
+            ctx.fillStyle = "#cccccc"; 
+            ctx.fillText("RECEBEDOR: " + recebedor.toUpperCase(), pad, y);
+            y += espacamentoLinha;
+            ctx.fillStyle = "white"; // volta pro branco
+
+            // 4. Endereço
+            ctx.font = fontePadrao;
             const enderecoTexto = `📍 ${rua}, ${numero} - ${bairro}`;
             if(ctx.measureText(enderecoTexto).width > (largura - 60)) {
                  ctx.fillText(`📍 ${rua}, ${numero}`, pad, y);
@@ -323,22 +337,22 @@
             }
             y += espacamentoLinha + 10;
 
-            // 4. Horário (Verde)
+            // 5. Horário (Verde)
             ctx.font = fontePadrao;
             ctx.fillStyle = "#25D366";
             ctx.fillText("⏰ ENTREGA: " + horario, pad, y);
             y += espacamentoLinha;
 
-            // 5. Pagamento (Novo - Cor Amarela/Ouro para destaque)
+            // 6. Pagamento (Ouro)
             ctx.font = fontePadrao;
-            ctx.fillStyle = "#FFD700"; // Cor Ouro
+            ctx.fillStyle = "#FFD700"; 
             ctx.fillText("💲 PAGAMENTO: " + pagamento.toUpperCase(), pad, y);
             y += espacamentoLinha + 10;
 
-            // 6. Obs
+            // 7. Obs
             if(obs) {
                 ctx.fillStyle = "#dddddd";
-                ctx.font = "italic 30px sans-serif";
+                ctx.font = "italic bold 36px sans-serif"; 
                 
                 const wrapWidth = largura - 80;
                 const words = ("Obs: " + obs).split(' ');
@@ -348,7 +362,7 @@
                     if (ctx.measureText(testLine).width > wrapWidth && n > 0) {
                         ctx.fillText(line, pad, y);
                         line = words[n] + ' ';
-                        y += 40;
+                        y += 45; 
                     } else {
                         line = testLine;
                     }
