@@ -168,6 +168,9 @@
         <label>HORÁRIO *</label>
         <input type="text" id="horario" placeholder="Ex: Antes das 16h">
 
+        <label>FORMA DE PAGAMENTO *</label>
+        <input type="text" id="pagamento" placeholder="Ex: Pix, Dinheiro, Já Pago">
+
         <label>OBSERVAÇÕES</label>
         <textarea id="obs" rows="3"></textarea>
     </div>
@@ -199,7 +202,7 @@
 
         let imgProcessada = null;
 
-        // --- SISTEMA DE FOTO (MANTIDO IGUAL POIS FUNCIONOU) ---
+        // --- SISTEMA DE FOTO ---
         cameraInput.addEventListener('change', function(e) {
             if (e.target.files.length === 0) return;
             statusMsg.style.display = 'block';
@@ -242,7 +245,7 @@
             reader.readAsDataURL(file);
         });
 
-        // --- GERADOR DA ETIQUETA (FONTE AJUSTADA) ---
+        // --- GERADOR DA ETIQUETA ---
         function gerarEtiqueta() {
             if (!imgProcessada) {
                 alert("⚠️ É necessário tirar a foto da notinha primeiro.");
@@ -254,10 +257,12 @@
             const numero = document.getElementById('numero').value;
             const bairro = document.getElementById('bairro').value;
             const horario = document.getElementById('horario').value;
+            const pagamento = document.getElementById('pagamento').value; // Novo
             const recebedor = document.getElementById('recebedor').value;
             const obs = document.getElementById('obs').value;
 
-            if (!nome || !rua || !numero || !bairro || !horario) {
+            // Validação agora inclui Pagamento
+            if (!nome || !rua || !numero || !bairro || !horario || !pagamento) {
                 alert("⚠️ Preencha os campos obrigatórios (*)");
                 return;
             }
@@ -266,8 +271,8 @@
             const escala = largura / imgProcessada.width;
             const alturaFoto = imgProcessada.height * escala;
             
-            // Aumentei o rodapé padrão pois as letras agora são maiores
-            let alturaRodape = 550; 
+            // Aumentei o rodapé para caber o pagamento
+            let alturaRodape = 600; 
             if (obs.length > 50) alturaRodape += 80;
 
             canvas.width = largura;
@@ -283,14 +288,13 @@
             ctx.fillStyle = "#1c1c1e";
             ctx.fillRect(0, yBase, largura, alturaRodape);
 
-            // CONFIGURAÇÃO GERAL DA FONTE GRANDE
+            // CONFIGURAÇÃO DA FONTE
             ctx.textAlign = "left";
             const pad = 40;
-            let y = yBase + 70; // Margem superior interna
+            let y = yBase + 70;
 
-            // Definindo a fonte padrão (Tudo 36px Negrito)
             const fontePadrao = "bold 36px sans-serif";
-            const espacamentoLinha = 55; // Espaço entre uma linha e outra
+            const espacamentoLinha = 55;
 
             // 1. Cliente
             ctx.font = fontePadrao;
@@ -298,7 +302,7 @@
             ctx.fillText("CLIENTE: " + nome.toUpperCase(), pad, y);
             y += espacamentoLinha;
 
-            // 2. Recebedor (Agora mesmo tamanho e branco)
+            // 2. Recebedor
             if(recebedor) {
                 ctx.font = fontePadrao;
                 ctx.fillStyle = "white"; 
@@ -306,34 +310,36 @@
                 y += espacamentoLinha;
             }
 
-            // 3. Endereço (Mesmo tamanho)
+            // 3. Endereço
             ctx.font = fontePadrao;
             ctx.fillStyle = "white";
-            
-            // Lógica para quebrar linha se o endereço for muito grande com a letra 36px
             const enderecoTexto = `📍 ${rua}, ${numero} - ${bairro}`;
             if(ctx.measureText(enderecoTexto).width > (largura - 60)) {
-                // Se for muito grande, quebra em duas linhas
                  ctx.fillText(`📍 ${rua}, ${numero}`, pad, y);
-                 y += 45; // Pulo menor para a segunda linha do endereço
+                 y += 45;
                  ctx.fillText(`   ${bairro}`, pad, y);
             } else {
                 ctx.fillText(enderecoTexto, pad, y);
             }
-            y += espacamentoLinha + 10; // Um espacinho extra antes do horário
+            y += espacamentoLinha + 10;
 
-            // 4. Horário (Mesmo tamanho, cor Verde)
+            // 4. Horário (Verde)
             ctx.font = fontePadrao;
             ctx.fillStyle = "#25D366";
             ctx.fillText("⏰ ENTREGA: " + horario, pad, y);
             y += espacamentoLinha;
 
-            // 5. Obs (Mantive um pouco menor para caber, mas legível)
+            // 5. Pagamento (Novo - Cor Amarela/Ouro para destaque)
+            ctx.font = fontePadrao;
+            ctx.fillStyle = "#FFD700"; // Cor Ouro
+            ctx.fillText("💲 PAGAMENTO: " + pagamento.toUpperCase(), pad, y);
+            y += espacamentoLinha + 10;
+
+            // 6. Obs
             if(obs) {
                 ctx.fillStyle = "#dddddd";
-                ctx.font = "italic 30px sans-serif"; // Aumentei um pouco também
+                ctx.font = "italic 30px sans-serif";
                 
-                // Quebra de linha simples para obs
                 const wrapWidth = largura - 80;
                 const words = ("Obs: " + obs).split(' ');
                 let line = '';
