@@ -36,29 +36,43 @@
             margin-bottom: 15px;
         }
 
-        .camera-btn {
-            background-color: #2c2c2e;
-            border: 2px dashed #48484a;
-            border-radius: 12px;
-            width: 100%;
-            height: 120px;
+        /* Área de Botões da Foto */
+        .photo-buttons {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: #25D366;
-            font-weight: bold;
-            position: relative;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .camera-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
+        .btn-photo-action {
+            flex: 1;
+            padding: 20px 10px;
+            border-radius: 10px;
+            border: 2px dashed #444;
+            background: #2c2c2e;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
             cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-photo-action span {
+            font-size: 24px;
+        }
+
+        .btn-photo-action:active {
+            background-color: #3a3a3c;
+            border-color: #25D366;
+        }
+
+        /* Inputs escondidos */
+        .hidden-input {
+            display: none;
         }
 
         #previewImg {
@@ -77,10 +91,7 @@
             margin-top: 10px;
         }
 
-        /* Span para marcar obrigatório */
-        label span {
-            color: #ff453a;
-        }
+        label span { color: #ff453a; }
 
         input, textarea {
             width: 100%;
@@ -93,9 +104,7 @@
             box-sizing: border-box;
         }
 
-        input:focus, textarea:focus {
-            outline: 2px solid #25D366;
-        }
+        input:focus, textarea:focus { outline: 2px solid #25D366; }
 
         .btn-primary {
             background-color: #007aff;
@@ -139,14 +148,26 @@
     </div>
 
     <div class="card">
-        <div class="camera-btn">
-            <span style="font-size: 30px;">📷</span>
-            <span>Tocar para tirar foto</span>
-            <input type="file" id="cameraInput" class="camera-input" accept="image/*">
+        <label style="margin-top:0; margin-bottom:10px; text-align:center;">ANEXAR NOTINHA:</label>
+        
+        <div class="photo-buttons">
+            <div class="btn-photo-action" onclick="document.getElementById('inputCamera').click()">
+                <span>📷</span>
+                TIRAR FOTO
+            </div>
+            
+            <div class="btn-photo-action" onclick="document.getElementById('inputGaleria').click()">
+                <span>🖼️</span>
+                GALERIA
+            </div>
         </div>
+
+        <input type="file" id="inputCamera" class="hidden-input" accept="image/*" capture="environment">
+        <input type="file" id="inputGaleria" class="hidden-input" accept="image/*">
+
         <p id="statusMsg">Processando imagem...</p>
         <img id="previewImg">
-        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:10px; width:100%; display:none;" id="btnReset">❌ Limpar / Começar do zero</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:10px; width:100%; display:none;" id="btnReset">❌ Remover / Começar do zero</button>
     </div>
 
     <div class="card">
@@ -200,7 +221,8 @@
     </div>
 
     <script>
-        const cameraInput = document.getElementById('cameraInput');
+        const inputCamera = document.getElementById('inputCamera');
+        const inputGaleria = document.getElementById('inputGaleria');
         const previewImg = document.getElementById('previewImg');
         const statusMsg = document.getElementById('statusMsg');
         const canvas = document.getElementById('finalCanvas');
@@ -210,15 +232,14 @@
 
         let imgProcessada = null;
 
-        // --- SISTEMA DE FOTO ---
-        cameraInput.addEventListener('change', function(e) {
-            if (e.target.files.length === 0) return;
+        // Função Genérica para processar a foto (usada pelos dois botões)
+        function processarFoto(file) {
+            if (!file) return;
+            
             statusMsg.style.display = 'block';
             statusMsg.innerText = "⏳ Ajustando tamanho da foto...";
             
-            const file = e.target.files[0];
             const reader = new FileReader();
-
             reader.onload = function(event) {
                 const tempImg = new Image();
                 tempImg.onload = function() {
@@ -251,19 +272,28 @@
                 tempImg.src = event.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        // Evento Botão Câmera
+        inputCamera.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) processarFoto(e.target.files[0]);
+        });
+
+        // Evento Botão Galeria
+        inputGaleria.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) processarFoto(e.target.files[0]);
         });
 
         // --- GERADOR DA ETIQUETA ---
         function gerarEtiqueta() {
             if (!imgProcessada) {
-                alert("⚠️ É necessário tirar a foto da notinha primeiro.");
+                alert("⚠️ É necessário anexar a notinha (Tire foto ou escolha da galeria).");
                 return;
             }
 
-            // Coleta de dados
             const nome = document.getElementById('nome').value;
             const telefone = document.getElementById('telefone').value;
-            const recebedor = document.getElementById('recebedor').value; // Agora obrigatório
+            const recebedor = document.getElementById('recebedor').value;
             const rua = document.getElementById('rua').value;
             const numero = document.getElementById('numero').value;
             const bairro = document.getElementById('bairro').value;
@@ -271,9 +301,9 @@
             const pagamento = document.getElementById('pagamento').value;
             const obs = document.getElementById('obs').value;
 
-            // Validação de OBRIGATÓRIOS (Todos menos obs)
+            // Validação
             if (!nome || !telefone || !recebedor || !rua || !numero || !bairro || !horario || !pagamento) {
-                alert("⚠️ Preencha todos os campos obrigatórios (marcados com *)");
+                alert("⚠️ Preencha todos os campos obrigatórios (*)");
                 return;
             }
 
@@ -281,52 +311,46 @@
             const escala = largura / imgProcessada.width;
             const alturaFoto = imgProcessada.height * escala;
             
-            // Altura do rodapé
             let alturaRodape = 680; 
             if (obs.length > 40) alturaRodape += 100;
 
             canvas.width = largura;
             canvas.height = alturaFoto + alturaRodape;
 
-            // Fundo Branco e Foto
+            // Desenhar
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(imgProcessada, 0, 0, largura, alturaFoto);
 
-            // Fundo Rodapé Preto
+            // Rodapé
             const yBase = alturaFoto;
             ctx.fillStyle = "#1c1c1e";
             ctx.fillRect(0, yBase, largura, alturaRodape);
 
-            // CONFIGURAÇÃO DA FONTE
+            // Textos
             ctx.textAlign = "left";
             const pad = 40;
             let y = yBase + 70;
-
             const fontePadrao = "bold 36px sans-serif";
             const espacamentoLinha = 55;
 
-            // 1. Cliente
+            // Cliente
             ctx.font = fontePadrao;
             ctx.fillStyle = "white";
             ctx.fillText("CLIENTE: " + nome.toUpperCase(), pad, y);
             y += espacamentoLinha;
 
-            // 2. Telefone
-            ctx.font = fontePadrao;
-            ctx.fillStyle = "white";
+            // Telefone
             ctx.fillText("TEL: " + telefone, pad, y);
             y += espacamentoLinha;
 
-            // 3. Recebedor (Agora sempre exibe pois é obrigatório)
-            ctx.font = fontePadrao;
+            // Recebedor
             ctx.fillStyle = "#cccccc"; 
             ctx.fillText("RECEBEDOR: " + recebedor.toUpperCase(), pad, y);
             y += espacamentoLinha;
-            ctx.fillStyle = "white"; // volta pro branco
+            ctx.fillStyle = "white";
 
-            // 4. Endereço
-            ctx.font = fontePadrao;
+            // Endereço
             const enderecoTexto = `📍 ${rua}, ${numero} - ${bairro}`;
             if(ctx.measureText(enderecoTexto).width > (largura - 60)) {
                  ctx.fillText(`📍 ${rua}, ${numero}`, pad, y);
@@ -337,23 +361,20 @@
             }
             y += espacamentoLinha + 10;
 
-            // 5. Horário (Verde)
-            ctx.font = fontePadrao;
+            // Horário
             ctx.fillStyle = "#25D366";
             ctx.fillText("⏰ ENTREGA: " + horario, pad, y);
             y += espacamentoLinha;
 
-            // 6. Pagamento (Ouro)
-            ctx.font = fontePadrao;
+            // Pagamento
             ctx.fillStyle = "#FFD700"; 
             ctx.fillText("💲 PAGAMENTO: " + pagamento.toUpperCase(), pad, y);
             y += espacamentoLinha + 10;
 
-            // 7. Obs
+            // Obs
             if(obs) {
                 ctx.fillStyle = "#dddddd";
                 ctx.font = "italic bold 36px sans-serif"; 
-                
                 const wrapWidth = largura - 80;
                 const words = ("Obs: " + obs).split(' ');
                 let line = '';
@@ -370,7 +391,7 @@
                 ctx.fillText(line, pad, y);
             }
 
-            // Linha verde decorativa
+            // Linha decorativa
             ctx.strokeStyle = "#25D366";
             ctx.lineWidth = 10;
             ctx.beginPath();
@@ -378,7 +399,6 @@
             ctx.lineTo(largura, yBase);
             ctx.stroke();
 
-            // Mostra
             resultArea.style.display = "block";
             resultArea.scrollIntoView({ behavior: 'smooth' });
         }
