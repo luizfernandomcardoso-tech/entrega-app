@@ -3,419 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>App Entrega</title>
+    <title>App Entrega - Fix Mobile</title>
     <style>
         body {
-            background-color: #000000;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, system-ui, sans-serif;
+            padding: 15px;
             margin: 0;
-            padding: 20px;
-            padding-bottom: 80px;
-        }
-
-        .app-header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-        
-        .app-header h1 {
-            font-size: 20px;
-            color: #25D366;
-            margin: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .card {
             background: #1c1c1e;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 15px;
             margin-bottom: 15px;
         }
 
-        /* Área de Botões da Foto */
-        .photo-buttons {
+        /* Botão de Câmera Melhorado */
+        .camera-box {
+            background-color: #2c2c2e;
+            border: 2px dashed #48484a;
+            border-radius: 12px;
+            height: 100px;
+            position: relative;
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-photo-action {
-            flex: 1;
-            padding: 20px 10px;
-            border-radius: 10px;
-            border: 2px dashed #444;
-            background: #2c2c2e;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            flex-direction: column;
+            color: #25D366;
+            font-weight: bold;
         }
 
-        .btn-photo-action span {
-            font-size: 24px;
-        }
-
-        .btn-photo-action:active {
-            background-color: #3a3a3c;
-            border-color: #25D366;
-        }
-
-        /* Inputs escondidos */
-        .hidden-input {
-            display: none;
+        .camera-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            z-index: 2;
         }
 
         #previewImg {
             width: 100%;
-            border-radius: 8px;
+            border-radius: 10px;
             display: none;
             margin-top: 10px;
-            border: 2px solid #25D366;
         }
 
-        label {
-            font-size: 13px;
+        /* Botão URGENTE - Estilo Toggle */
+        .btn-urgent {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #48484a;
+            background: #2c2c2e;
             color: #8e8e93;
-            margin-bottom: 4px;
-            display: block;
-            margin-top: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 15px;
+            cursor: pointer;
         }
 
-        label span { color: #ff453a; }
+        .btn-urgent.active {
+            background: #ff453a;
+            color: white;
+            border-color: #ff453a;
+        }
 
+        label { color: #8e8e93; font-size: 12px; display: block; margin-top: 10px; }
+        
         input, textarea {
             width: 100%;
             background: #2c2c2e;
-            border: none;
+            border: 1px solid #3a3a3c;
             padding: 12px;
             border-radius: 8px;
-            color: white;
+            color: #fff;
             font-size: 16px;
             box-sizing: border-box;
+            margin-top: 5px;
         }
 
-        input:focus, textarea:focus { outline: 2px solid #25D366; }
-
-        .btn-primary {
-            background-color: #007aff;
+        .btn-main {
+            width: 100%;
+            background: #007aff;
             color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
             font-weight: bold;
-            padding: 16px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-            cursor: pointer;
+            font-size: 18px;
+            margin-top: 10px;
         }
 
-        .btn-whatsapp {
-            background-color: #25D366;
-            color: white;
-            font-weight: bold;
-            padding: 16px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #statusMsg {
-            text-align: center;
-            font-size: 14px;
-            margin-top: 10px;
-            color: #ffd60a;
-            display: none;
-        }
+        #resultArea { display: none; text-align: center; }
+        #finalImg { width: 100%; border-radius: 12px; margin: 15px 0; border: 2px solid #333; }
+        
+        .tip { background: #333; padding: 10px; border-radius: 8px; font-size: 13px; color: #ccc; }
     </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <h1>Entregas Loja</h1>
-    </div>
-
     <div class="card">
-        <label style="margin-top:0; margin-bottom:10px; text-align:center;">ANEXAR NOTINHA:</label>
-        
-        <div class="photo-buttons">
-            <div class="btn-photo-action" onclick="document.getElementById('inputCamera').click()">
-                <span>📷</span>
-                TIRAR FOTO
-            </div>
-            
-            <div class="btn-photo-action" onclick="document.getElementById('inputGaleria').click()">
-                <span>🖼️</span>
-                GALERIA
-            </div>
+        <div class="camera-box">
+            <span style="font-size:30px">📷</span>
+            <span>Tirar Foto da Notinha</span>
+            <input type="file" id="camInp" class="camera-input" accept="image/*" capture="camera">
         </div>
-
-        <input type="file" id="inputCamera" class="hidden-input" accept="image/*" capture="environment">
-        <input type="file" id="inputGaleria" class="hidden-input" accept="image/*">
-
-        <p id="statusMsg">Processando imagem...</p>
         <img id="previewImg">
-        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:10px; width:100%; display:none;" id="btnReset">❌ Remover / Começar do zero</button>
     </div>
+
+    <!-- Botão Urgente que muda de cor ao tocar -->
+    <button type="button" id="urgentBtn" class="btn-urgent" onclick="toggleUrgent()">
+        ⚠️ ENTREGA NORMAL
+    </button>
 
     <div class="card">
-        <label>NOME DO CLIENTE <span>*</span></label>
+        <label>CLIENTE *</label>
         <input type="text" id="nome">
-
-        <label>TELEFONE <span>*</span></label>
-        <input type="tel" id="telefone" placeholder="Ex: (35) 99999-9999">
-
-        <label>QUEM RECEBE <span>*</span></label>
-        <input type="text" id="recebedor" placeholder="Ex: Portaria / Próprio">
-
-        <label>RUA <span>*</span></label>
-        <input type="text" id="rua">
-
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1">
-                <label>NÚMERO <span>*</span></label>
-                <input type="text" id="numero">
-            </div>
-            <div style="flex:2">
-                <label>BAIRRO <span>*</span></label>
-                <input type="text" id="bairro">
-            </div>
-        </div>
-
-        <label>HORÁRIO <span>*</span></label>
-        <input type="text" id="horario" placeholder="Ex: Antes das 16h">
-
-        <label>FORMA DE PAGAMENTO <span>*</span></label>
-        <input type="text" id="pagamento" placeholder="Ex: Pix, Dinheiro, Já Pago">
-
-        <label>OBSERVAÇÕES (OPCIONAL)</label>
-        <textarea id="obs" rows="3"></textarea>
-    </div>
-
-    <div class="btn-primary" onclick="gerarEtiqueta()">
-        GERAR ETIQUETA
-    </div>
-
-    <div id="resultArea" class="card" style="display:none; margin-top:20px;">
-        <h3 style="text-align:center; margin:0 0 10px 0;">Pronto!</h3>
-        <canvas id="finalCanvas" style="width:100%; border-radius:8px;"></canvas>
         
-        <div class="btn-whatsapp" onclick="compartilhar()">
-            📤 ENVIAR NO WHATSAPP
-        </div>
-        <p style="text-align:center; color:#666; font-size:12px; margin-top:10px;">
-            Se não abrir o WhatsApp, tire um print da tela.
-        </p>
+        <label>ENDEREÇO COMPLETO *</label>
+        <input type="text" id="end">
+        
+        <label>HORÁRIO *</label>
+        <input type="text" id="hora">
+        
+        <label>OBSERVAÇÕES</label>
+        <textarea id="obs" rows="2"></textarea>
+    </div>
+
+    <button class="btn-main" onclick="gerar()">GERAR ETIQUETA</button>
+
+    <div id="resultArea" class="card">
+        <h3 style="margin:0">Pronto!</h3>
+        <canvas id="canvas" style="display:none"></canvas>
+        <img id="finalImg">
+        <div class="tip">👆 <b>Segure o dedo na imagem</b> para "Compartilhar" ou "Salvar".</div>
+        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:15px; font-weight:bold">Limpar e Novo</button>
     </div>
 
     <script>
-        const inputCamera = document.getElementById('inputCamera');
-        const inputGaleria = document.getElementById('inputGaleria');
-        const previewImg = document.getElementById('previewImg');
-        const statusMsg = document.getElementById('statusMsg');
-        const canvas = document.getElementById('finalCanvas');
-        const ctx = canvas.getContext('2d');
-        const resultArea = document.getElementById('resultArea');
-        const btnReset = document.getElementById('btnReset');
+        let urgente = false;
+        let fotoData = null;
 
-        let imgProcessada = null;
+        function toggleUrgent() {
+            urgente = !urgente;
+            const btn = document.getElementById('urgentBtn');
+            btn.classList.toggle('active');
+            btn.innerText = urgente ? "🚨 URGENTE SELECIONADO" : "⚠️ ENTREGA NORMAL";
+        }
 
-        // Função Genérica para processar a foto (usada pelos dois botões)
-        function processarFoto(file) {
-            if (!file) return;
-            
-            statusMsg.style.display = 'block';
-            statusMsg.innerText = "⏳ Ajustando tamanho da foto...";
-            
+        document.getElementById('camInp').onchange = function(e) {
             const reader = new FileReader();
             reader.onload = function(event) {
-                const tempImg = new Image();
-                tempImg.onload = function() {
-                    const MAX_SIZE = 1200;
-                    let w = tempImg.width;
-                    let h = tempImg.height;
-
-                    if (w > h) {
-                        if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
-                    } else {
-                        if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
-                    }
-
-                    const tCanvas = document.createElement('canvas');
-                    tCanvas.width = w;
-                    tCanvas.height = h;
-                    const tCtx = tCanvas.getContext('2d');
-                    tCtx.drawImage(tempImg, 0, 0, w, h);
-
-                    imgProcessada = new Image();
-                    imgProcessada.src = tCanvas.toDataURL('image/jpeg', 0.8);
-                    
-                    imgProcessada.onload = function() {
-                        previewImg.src = imgProcessada.src;
-                        previewImg.style.display = 'block';
-                        statusMsg.style.display = 'none';
-                        btnReset.style.display = 'block';
-                    }
-                };
-                tempImg.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Evento Botão Câmera
-        inputCamera.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) processarFoto(e.target.files[0]);
-        });
-
-        // Evento Botão Galeria
-        inputGaleria.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) processarFoto(e.target.files[0]);
-        });
-
-        // --- GERADOR DA ETIQUETA ---
-        function gerarEtiqueta() {
-            if (!imgProcessada) {
-                alert("⚠️ É necessário anexar a notinha (Tire foto ou escolha da galeria).");
-                return;
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 800;
+                    canvas.height = (img.height * 800) / img.width;
+                    ctx.drawImage(img, 0, 0, 800, canvas.height);
+                    fotoData = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('previewImg').src = fotoData;
+                    document.getElementById('previewImg').style.display = 'block';
+                }
+                img.src = event.target.result;
             }
+            reader.readAsDataURL(e.target.files[0]);
+        };
 
-            const nome = document.getElementById('nome').value;
-            const telefone = document.getElementById('telefone').value;
-            const recebedor = document.getElementById('recebedor').value;
-            const rua = document.getElementById('rua').value;
-            const numero = document.getElementById('numero').value;
-            const bairro = document.getElementById('bairro').value;
-            const horario = document.getElementById('horario').value;
-            const pagamento = document.getElementById('pagamento').value;
-            const obs = document.getElementById('obs').value;
-
-            // Validação
-            if (!nome || !telefone || !recebedor || !rua || !numero || !bairro || !horario || !pagamento) {
-                alert("⚠️ Preencha todos os campos obrigatórios (*)");
-                return;
-            }
-
-            const largura = 800;
-            const escala = largura / imgProcessada.width;
-            const alturaFoto = imgProcessada.height * escala;
+        function gerar() {
+            if(!fotoData) return alert("Tire a foto primeiro!");
             
-            let alturaRodape = 680; 
-            if (obs.length > 40) alturaRodape += 100;
+            const cv = document.getElementById('canvas');
+            const ctx = cv.getContext('2d');
+            const imgN = new Image();
+            
+            imgN.onload = function() {
+                const hRodape = 450;
+                cv.width = 800;
+                cv.height = imgN.height + hRodape;
 
-            canvas.width = largura;
-            canvas.height = alturaFoto + alturaRodape;
+                // Fundo Branco
+                ctx.fillStyle = "white";
+                ctx.fillRect(0,0,800,cv.height);
+                ctx.drawImage(imgN, 0, 0);
 
-            // Desenhar
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(imgProcessada, 0, 0, largura, alturaFoto);
+                // RODAPÉ: Se urgente fica Vermelho, se não, Preto
+                ctx.fillStyle = urgente ? "#ff0000" : "#1c1c1e";
+                ctx.fillRect(0, imgN.height, 800, hRodape);
 
-            // Rodapé
-            const yBase = alturaFoto;
-            ctx.fillStyle = "#1c1c1e";
-            ctx.fillRect(0, yBase, largura, alturaRodape);
+                // Textos
+                ctx.fillStyle = "white";
+                ctx.textAlign = "left";
+                let y = imgN.height + 70;
 
-            // Textos
-            ctx.textAlign = "left";
-            const pad = 40;
-            let y = yBase + 70;
-            const fontePadrao = "bold 36px sans-serif";
-            const espacamentoLinha = 55;
-
-            // Cliente
-            ctx.font = fontePadrao;
-            ctx.fillStyle = "white";
-            ctx.fillText("CLIENTE: " + nome.toUpperCase(), pad, y);
-            y += espacamentoLinha;
-
-            // Telefone
-            ctx.fillText("TEL: " + telefone, pad, y);
-            y += espacamentoLinha;
-
-            // Recebedor
-            ctx.fillStyle = "#cccccc"; 
-            ctx.fillText("RECEBEDOR: " + recebedor.toUpperCase(), pad, y);
-            y += espacamentoLinha;
-            ctx.fillStyle = "white";
-
-            // Endereço
-            const enderecoTexto = `📍 ${rua}, ${numero} - ${bairro}`;
-            if(ctx.measureText(enderecoTexto).width > (largura - 60)) {
-                 ctx.fillText(`📍 ${rua}, ${numero}`, pad, y);
-                 y += 45;
-                 ctx.fillText(`   ${bairro}`, pad, y);
-            } else {
-                ctx.fillText(enderecoTexto, pad, y);
-            }
-            y += espacamentoLinha + 10;
-
-            // Horário
-            ctx.fillStyle = "#25D366";
-            ctx.fillText("⏰ ENTREGA: " + horario, pad, y);
-            y += espacamentoLinha;
-
-            // Pagamento
-            ctx.fillStyle = "#FFD700"; 
-            ctx.fillText("💲 PAGAMENTO: " + pagamento.toUpperCase(), pad, y);
-            y += espacamentoLinha + 10;
-
-            // Obs
-            if(obs) {
-                ctx.fillStyle = "#dddddd";
-                ctx.font = "italic bold 36px sans-serif"; 
-                const wrapWidth = largura - 80;
-                const words = ("Obs: " + obs).split(' ');
-                let line = '';
-                for(let n = 0; n < words.length; n++) {
-                    let testLine = line + words[n] + ' ';
-                    if (ctx.measureText(testLine).width > wrapWidth && n > 0) {
-                        ctx.fillText(line, pad, y);
-                        line = words[n] + ' ';
-                        y += 45; 
-                    } else {
-                        line = testLine;
-                    }
+                if(urgente) {
+                    ctx.font = "bold 50px sans-serif";
+                    ctx.fillText("🚨 ENTREGA URGENTE 🚨", 40, y);
+                    y += 80;
                 }
-                ctx.fillText(line, pad, y);
-            }
 
-            // Linha decorativa
-            ctx.strokeStyle = "#25D366";
-            ctx.lineWidth = 10;
-            ctx.beginPath();
-            ctx.moveTo(0, yBase);
-            ctx.lineTo(largura, yBase);
-            ctx.stroke();
+                ctx.font = "bold 40px sans-serif";
+                ctx.fillText("CLIENTE: " + document.getElementById('nome').value.toUpperCase(), 40, y);
+                y += 70;
+                
+                ctx.font = "bold 35px sans-serif";
+                ctx.fillText("END: " + document.getElementById('end').value.toUpperCase(), 40, y);
+                y += 80;
 
-            resultArea.style.display = "block";
-            resultArea.scrollIntoView({ behavior: 'smooth' });
-        }
+                ctx.fillStyle = urgente ? "yellow" : "#25D366";
+                ctx.font = "bold 45px sans-serif";
+                ctx.fillText("⏰ HORÁRIO: " + document.getElementById('hora').value.toUpperCase(), 40, y);
 
-        function compartilhar() {
-            canvas.toBlob(blob => {
-                const file = new File([blob], "entrega.jpg", { type: "image/jpeg" });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Entrega',
-                        text: 'Detalhes da entrega'
-                    });
-                } else {
-                    alert("Segure na imagem abaixo para copiar.");
-                }
-            }, 'image/jpeg', 0.85);
+                y += 70;
+                ctx.fillStyle = "white";
+                ctx.font = "italic 30px sans-serif";
+                ctx.fillText("Obs: " + document.getElementById('obs').value, 40, y);
+
+                // Converter para imagem final
+                document.getElementById('finalImg').src = cv.toDataURL('image/jpeg', 0.9);
+                document.getElementById('resultArea').style.display = 'block';
+                document.getElementById('resultArea').scrollIntoView({behavior: "smooth"});
+            };
+            imgN.src = fotoData;
         }
     </script>
 </body>
