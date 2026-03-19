@@ -3,52 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>App Entrega - Final</title>
+    <title>App Entrega - Oficial</title>
     <style>
         body {
             background-color: #000;
             color: #fff;
             font-family: -apple-system, system-ui, sans-serif;
-            padding: 15px;
+            padding: 20px;
             margin: 0;
+            padding-bottom: 80px;
             -webkit-tap-highlight-color: transparent;
         }
 
         .card {
             background: #1c1c1e;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
         }
 
-        .camera-box {
+        .camera-btn {
             background-color: #2c2c2e;
             border: 2px dashed #48484a;
             border-radius: 12px;
-            height: 100px;
-            position: relative;
+            width: 100%;
+            height: 110px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             color: #25D366;
             font-weight: bold;
+            position: relative;
         }
 
         .camera-input {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0;
-            z-index: 2;
+            cursor: pointer;
+            z-index: 10;
         }
 
         #previewImg {
             width: 100%;
-            border-radius: 10px;
+            border-radius: 8px;
             display: none;
             margin-top: 10px;
+            border: 2px solid #25D366;
         }
 
+        /* Botão Urgente */
         .btn-urgent {
             width: 100%;
             padding: 15px;
@@ -57,7 +62,6 @@
             background: #2c2c2e;
             color: #8e8e93;
             font-weight: bold;
-            font-size: 16px;
             margin-bottom: 15px;
             cursor: pointer;
         }
@@ -68,7 +72,7 @@
             border-color: #ff453a;
         }
 
-        label { color: #8e8e93; font-size: 11px; display: block; margin-top: 10px; text-transform: uppercase; }
+        label { font-size: 11px; color: #8e8e93; display: block; margin-top: 10px; text-transform: uppercase; }
         
         input, textarea {
             width: 100%;
@@ -76,208 +80,240 @@
             border: 1px solid #3a3a3c;
             padding: 12px;
             border-radius: 8px;
-            color: #fff;
+            color: white;
             font-size: 16px;
             box-sizing: border-box;
             margin-top: 5px;
         }
 
-        .btn-main {
-            width: 100%;
-            background: #007aff;
+        .btn-primary {
+            background-color: #007aff;
             color: white;
-            border: none;
+            font-weight: bold;
             padding: 18px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 10px;
-        }
-
-        /* ESTILO DO BOTÃO WHATSAPP */
-        .btn-whatsapp {
-            width: 100%;
-            background-color: #25D366 !important;
-            color: white !important;
-            border: none;
-            padding: 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 18px;
+            border-radius: 10px;
+            text-align: center;
             margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            cursor: pointer;
         }
 
-        #resultArea { display: none; text-align: center; }
-        #finalImg { width: 100%; border-radius: 12px; margin: 15px 0; border: 2px solid #333; }
-        
-        .tip { background: #333; padding: 10px; border-radius: 8px; font-size: 13px; color: #ccc; margin-top: 10px; }
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+            font-weight: bold;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #statusMsg { text-align: center; font-size: 14px; margin-top: 10px; color: #ffd60a; display: none; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="camera-box">
-            <span style="font-size:30px">📷</span>
-            <span>Tirar Foto da Notinha</span>
-            <input type="file" id="camInp" class="camera-input" accept="image/*" capture="camera">
+        <div class="camera-btn">
+            <span style="font-size: 30px;">📷</span>
+            <span>Tocar para tirar foto</span>
+            <input type="file" id="cameraInput" class="camera-input" accept="image/*" capture="camera">
         </div>
+        <p id="statusMsg">Processando imagem...</p>
         <img id="previewImg">
+        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:10px; width:100%; display:none;" id="btnReset">❌ Limpar / Novo</button>
     </div>
 
+    <!-- Botão Urgente -->
     <button type="button" id="urgentBtn" class="btn-urgent" onclick="toggleUrgent()">
-        ⚠️ ENTREGA NORMAL
+        ⚠️ ENTREGA NORMAL (CLIQUE PARA URGENTE)
     </button>
 
     <div class="card">
         <label>Nome do Cliente *</label>
         <input type="text" id="nome">
+        
         <label>Telefone</label>
-        <input type="tel" id="tel">
+        <input type="tel" id="telefone">
+
         <label>Quem Recebe</label>
         <input type="text" id="recebedor">
+
         <label>Rua *</label>
         <input type="text" id="rua">
+
         <div style="display:flex; gap:10px;">
-            <div style="flex:1"><label>Número *</label><input type="text" id="num"></div>
+            <div style="flex:1"><label>Número *</label><input type="text" id="numero"></div>
             <div style="flex:2"><label>Bairro *</label><input type="text" id="bairro"></div>
         </div>
-        <label>Horário de Entrega *</label>
-        <input type="text" id="hora">
+
+        <label>Horário *</label>
+        <input type="text" id="horario" placeholder="Ex: Antes das 18h">
+
         <label>Forma de Pagamento</label>
-        <input type="text" id="pagamento">
+        <input type="text" id="pagamento" placeholder="Pix, Cartão, Dinheiro">
+
         <label>Observações</label>
         <textarea id="obs" rows="2"></textarea>
     </div>
 
-    <button class="btn-main" onclick="gerar()">GERAR ETIQUETA FINAL</button>
+    <div class="btn-primary" onclick="gerarEtiqueta()">
+        GERAR ETIQUETA
+    </div>
 
-    <!-- ÁREA DE RESULTADO -->
-    <div id="resultArea" class="card">
-        <h3 style="margin:0">Etiqueta Pronta!</h3>
+    <div id="resultArea" class="card" style="display:none; margin-top:20px;">
+        <h3 style="text-align:center; margin:0 0 10px 0;">Pronto!</h3>
+        <canvas id="finalCanvas" style="width:100%; border-radius:8px;"></canvas>
         
-        <canvas id="canvas" style="display:none"></canvas>
-        <img id="finalImg">
-        
-        <!-- BOTÃO DE WHATSAPP -->
-        <button type="button" class="btn-whatsapp" onclick="enviarWhats()">
-            <span style="font-size:24px">📲</span> ENVIAR NO WHATSAPP
-        </button>
-
-        <div class="tip">👆 <b>Toque no botão acima</b> para enviar ou segure na imagem para salvar.</div>
-        
-        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:20px; font-weight:bold; width:100%;">❌ LIMPAR E NOVO</button>
+        <div class="btn-whatsapp" onclick="compartilhar()">
+            📤 ENVIAR NO WHATSAPP
+        </div>
+        <p style="text-align:center; color:#666; font-size:12px; margin-top:10px;">
+            Se não abrir o WhatsApp, tire um print da tela.
+        </p>
     </div>
 
     <script>
-        let urgente = false;
-        let fotoData = null;
+        const cameraInput = document.getElementById('cameraInput');
+        const previewImg = document.getElementById('previewImg');
+        const statusMsg = document.getElementById('statusMsg');
+        const canvas = document.getElementById('finalCanvas');
+        const ctx = canvas.getContext('2d');
+        const resultArea = document.getElementById('resultArea');
+        const btnReset = document.getElementById('btnReset');
+        
+        let imgProcessada = null;
+        let isUrgente = false;
 
         function toggleUrgent() {
-            urgente = !urgente;
+            isUrgente = !isUrgente;
             const btn = document.getElementById('urgentBtn');
             btn.classList.toggle('active');
-            btn.innerText = urgente ? "🚨 URGENTE SELECIONADO" : "⚠️ ENTREGA NORMAL";
+            btn.innerText = isUrgente ? "🚨 ENTREGA URGENTE SELECIONADA" : "⚠️ ENTREGA NORMAL (CLIQUE PARA URGENTE)";
         }
 
-        document.getElementById('camInp').onchange = function(e) {
+        cameraInput.addEventListener('change', function(e) {
+            if (e.target.files.length === 0) return;
+            statusMsg.style.display = 'block';
+            const file = e.target.files[0];
             const reader = new FileReader();
+
             reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    const cv = document.createElement('canvas');
-                    const ctx = cv.getContext('2d');
-                    cv.width = 800;
-                    cv.height = (img.height * 800) / img.width;
-                    ctx.drawImage(img, 0, 0, 800, cv.height);
-                    fotoData = cv.toDataURL('image/jpeg', 0.8);
-                    document.getElementById('previewImg').src = fotoData;
-                    document.getElementById('previewImg').style.display = 'block';
-                }
-                img.src = event.target.result;
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        };
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    const MAX_SIZE = 1000;
+                    let w = tempImg.width;
+                    let h = tempImg.height;
+                    if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } } 
+                    else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
 
-        function gerar() {
-            if(!fotoData) return alert("⚠️ Tire a foto primeiro!");
-            
-            const cv = document.getElementById('canvas');
-            const ctx = cv.getContext('2d');
-            const imgN = new Image();
-            
-            imgN.onload = function() {
-                const hRodape = 680;
-                cv.width = 800;
-                cv.height = imgN.height + hRodape;
+                    const tCanvas = document.createElement('canvas');
+                    tCanvas.width = w; tCanvas.height = h;
+                    tCanvas.getContext('2d').drawImage(tempImg, 0, 0, w, h);
 
-                ctx.fillStyle = "white";
-                ctx.fillRect(0,0,800,cv.height);
-                ctx.drawImage(imgN, 0, 0);
-
-                ctx.fillStyle = urgente ? "#ff0000" : "#1c1c1e";
-                ctx.fillRect(0, imgN.height, 800, hRodape);
-
-                ctx.fillStyle = "white";
-                ctx.textAlign = "left";
-                let y = imgN.height + 60;
-
-                if(urgente) {
-                    ctx.font = "bold 45px sans-serif";
-                    ctx.fillText("🚨 ENTREGA URGENTE 🚨", 40, y);
-                    y += 75;
-                }
-
-                ctx.font = "bold 35px sans-serif";
-                ctx.fillText("CLIENTE: " + document.getElementById('nome').value.toUpperCase(), 40, y);
-                y += 50;
-                ctx.fillText("TEL: " + document.getElementById('tel').value, 40, y);
-                y += 50;
-                ctx.fillText("RECEBER: " + document.getElementById('recebedor').value.toUpperCase(), 40, y);
-                y += 55;
-                ctx.font = "bold 32px sans-serif";
-                ctx.fillText("RUA: " + document.getElementById('rua').value.toUpperCase() + ", " + document.getElementById('num').value, 40, y);
-                y += 45;
-                ctx.fillText("BAIRRO: " + document.getElementById('bairro').value.toUpperCase(), 40, y);
-                y += 75;
-
-                ctx.fillStyle = urgente ? "yellow" : "#25D366";
-                ctx.font = "bold 42px sans-serif";
-                ctx.fillText("⏰ HORÁRIO: " + document.getElementById('hora').value.toUpperCase(), 40, y);
-                y += 65;
-
-                ctx.fillStyle = "white";
-                ctx.font = "bold 35px sans-serif";
-                ctx.fillText("💳 PAGTO: " + document.getElementById('pagamento').value.toUpperCase(), 40, y);
-                y += 65;
-                ctx.font = "italic 28px sans-serif";
-                ctx.fillText("Obs: " + document.getElementById('obs').value, 40, y);
-
-                document.getElementById('finalImg').src = cv.toDataURL('image/jpeg', 0.9);
-                document.getElementById('resultArea').style.display = 'block';
-                document.getElementById('resultArea').scrollIntoView({behavior: "smooth"});
+                    imgProcessada = new Image();
+                    imgProcessada.src = tCanvas.toDataURL('image/jpeg', 0.8);
+                    imgProcessada.onload = function() {
+                        previewImg.src = imgProcessada.src;
+                        previewImg.style.display = 'block';
+                        statusMsg.style.display = 'none';
+                        btnReset.style.display = 'block';
+                    }
+                };
+                tempImg.src = event.target.result;
             };
-            imgN.src = fotoData;
+            reader.readAsDataURL(file);
+        });
+
+        function gerarEtiqueta() {
+            if (!imgProcessada) return alert("Tire a foto da notinha primeiro!");
+
+            const dados = {
+                nome: document.getElementById('nome').value,
+                tel: document.getElementById('telefone').value,
+                rec: document.getElementById('recebedor').value,
+                rua: document.getElementById('rua').value,
+                num: document.getElementById('numero').value,
+                bai: document.getElementById('bairro').value,
+                hor: document.getElementById('horario').value,
+                pag: document.getElementById('pagamento').value,
+                obs: document.getElementById('obs').value
+            };
+
+            if (!dados.nome || !dados.rua || !dados.num || !dados.bai || !dados.hor) {
+                return alert("Preencha os campos obrigatórios (*)");
+            }
+
+            const largura = 800;
+            const escala = largura / imgProcessada.width;
+            const alturaFoto = imgProcessada.height * escala;
+            const alturaRodape = 680;
+
+            canvas.width = largura;
+            canvas.height = alturaFoto + alturaRodape;
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, largura, canvas.height);
+            ctx.drawImage(imgProcessada, 0, 0, largura, alturaFoto);
+
+            // COR DO RODAPÉ (PRETO OU VERMELHO)
+            ctx.fillStyle = isUrgente ? "#ff0000" : "#1c1c1e";
+            ctx.fillRect(0, alturaFoto, largura, alturaRodape);
+
+            ctx.fillStyle = "white";
+            ctx.textAlign = "left";
+            const pad = 40;
+            let y = alturaFoto + 70;
+
+            if(isUrgente) {
+                ctx.font = "bold 45px sans-serif";
+                ctx.fillText("🚨 ENTREGA URGENTE 🚨", pad, y);
+                y += 80;
+            }
+
+            ctx.font = "bold 38px sans-serif";
+            ctx.fillText("CLIENTE: " + dados.nome.toUpperCase(), pad, y);
+            y += 55;
+
+            if(dados.tel) { ctx.fillText("TEL: " + dados.tel, pad, y); y += 55; }
+            if(dados.rec) { ctx.fillText("RECEBER: " + dados.rec.toUpperCase(), pad, y); y += 55; }
+
+            ctx.font = "bold 34px sans-serif";
+            ctx.fillText("📍 " + dados.rua.toUpperCase() + ", " + dados.num, pad, y);
+            y += 50;
+            ctx.fillText("   BAIRRO: " + dados.bai.toUpperCase(), pad, y);
+            y += 80;
+
+            ctx.fillStyle = isUrgente ? "yellow" : "#25D366";
+            ctx.font = "bold 42px sans-serif";
+            ctx.fillText("⏰ HORÁRIO: " + dados.hor.toUpperCase(), pad, y);
+            y += 70;
+
+            ctx.fillStyle = "white";
+            ctx.font = "bold 36px sans-serif";
+            ctx.fillText("💳 PAGTO: " + dados.pag.toUpperCase(), pad, y);
+            y += 70;
+
+            if(dados.obs) {
+                ctx.font = "italic 30px sans-serif";
+                ctx.fillText("Obs: " + dados.obs, pad, y);
+            }
+
+            resultArea.style.display = "block";
+            resultArea.scrollIntoView({ behavior: 'smooth' });
         }
 
-        async function enviarWhats() {
-            const canvas = document.getElementById('canvas');
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], 'entrega.jpg', { type: 'image/jpeg' });
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: 'Etiqueta',
-                            text: 'Dados da Entrega'
-                        });
-                    } catch (err) { console.log(err); }
+        function compartilhar() {
+            canvas.toBlob(blob => {
+                const file = new File([blob], "entrega.jpg", { type: "image/jpeg" });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({ files: [file], title: 'Entrega' });
                 } else {
-                    alert("Seu navegador não suporta compartilhamento direto. Segure na imagem para salvar.");
+                    alert("Seu navegador não suporta envio direto. Tire um print ou segure na imagem para salvar.");
                 }
             }, 'image/jpeg', 0.9);
         }
