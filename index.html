@@ -94,6 +94,22 @@
             margin-top: 10px;
         }
 
+        .btn-whatsapp {
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
         #resultArea { display: none; text-align: center; }
         #finalImg { width: 100%; border-radius: 12px; margin: 15px 0; border: 2px solid #333; }
         
@@ -149,8 +165,13 @@
         <h3 style="margin:0">Etiqueta Pronta!</h3>
         <canvas id="canvas" style="display:none"></canvas>
         <img id="finalImg">
-        <div class="tip">👆 <b>Segure o dedo na imagem</b> para compartilhar no WhatsApp.</div>
-        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:15px; font-weight:bold">LIMPAR E NOVO</button>
+        
+        <button class="btn-whatsapp" onclick="compartilharNoWhatsapp()">
+            <span style="font-size:22px">📲</span> COMPARTILHAR NO WHATSAPP
+        </button>
+
+        <div class="tip" style="margin-top:15px">👆 Ou <b>Segure o dedo na imagem</b> para salvar.</div>
+        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:20px; font-weight:bold">LIMPAR E NOVO</button>
     </div>
 
     <script>
@@ -191,7 +212,7 @@
             const imgN = new Image();
             
             imgN.onload = function() {
-                const hRodape = 650; // Aumentado para caber mais informações
+                const hRodape = 650;
                 cv.width = 800;
                 cv.height = imgN.height + hRodape;
 
@@ -199,7 +220,6 @@
                 ctx.fillRect(0,0,800,cv.height);
                 ctx.drawImage(imgN, 0, 0);
 
-                // RODAPÉ DINÂMICO
                 ctx.fillStyle = urgente ? "#ff0000" : "#1c1c1e";
                 ctx.fillRect(0, imgN.height, 800, hRodape);
 
@@ -253,6 +273,27 @@
                 document.getElementById('resultArea').scrollIntoView({behavior: "smooth"});
             };
             imgN.src = fotoData;
+        }
+
+        async function compartilharNoWhatsapp() {
+            const canvas = document.getElementById('canvas');
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], 'entrega.jpg', { type: 'image/jpeg' });
+                
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Etiqueta de Entrega',
+                            text: 'Segue os dados da entrega:'
+                        });
+                    } catch (error) {
+                        console.log('Erro ao compartilhar:', error);
+                    }
+                } else {
+                    alert("Seu navegador não suporta o botão de compartilhar. Segure na imagem para salvar e enviar.");
+                }
+            }, 'image/jpeg', 0.9);
         }
     </script>
 </body>
