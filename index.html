@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>App Entrega - Completo</title>
+    <title>App Entrega - Final</title>
     <style>
         body {
             background-color: #000;
@@ -70,7 +70,7 @@
 
         label { color: #8e8e93; font-size: 11px; display: block; margin-top: 10px; text-transform: uppercase; }
         
-        input, textarea, select {
+        input, textarea {
             width: 100%;
             background: #2c2c2e;
             border: 1px solid #3a3a3c;
@@ -94,26 +94,28 @@
             margin-top: 10px;
         }
 
+        /* ESTILO DO BOTÃO WHATSAPP */
         .btn-whatsapp {
             width: 100%;
-            background: #25D366;
-            color: white;
+            background-color: #25D366 !important;
+            color: white !important;
             border: none;
-            padding: 18px;
+            padding: 20px;
             border-radius: 12px;
             font-weight: bold;
             font-size: 18px;
-            margin-top: 15px;
+            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
         }
 
         #resultArea { display: none; text-align: center; }
         #finalImg { width: 100%; border-radius: 12px; margin: 15px 0; border: 2px solid #333; }
         
-        .tip { background: #333; padding: 10px; border-radius: 8px; font-size: 13px; color: #ccc; }
+        .tip { background: #333; padding: 10px; border-radius: 8px; font-size: 13px; color: #ccc; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -134,44 +136,41 @@
     <div class="card">
         <label>Nome do Cliente *</label>
         <input type="text" id="nome">
-
         <label>Telefone</label>
         <input type="tel" id="tel">
-
         <label>Quem Recebe</label>
         <input type="text" id="recebedor">
-        
         <label>Rua *</label>
         <input type="text" id="rua">
-
         <div style="display:flex; gap:10px;">
             <div style="flex:1"><label>Número *</label><input type="text" id="num"></div>
             <div style="flex:2"><label>Bairro *</label><input type="text" id="bairro"></div>
         </div>
-        
         <label>Horário de Entrega *</label>
-        <input type="text" id="hora" placeholder="Ex: Até as 15h">
-
+        <input type="text" id="hora">
         <label>Forma de Pagamento</label>
-        <input type="text" id="pagamento" placeholder="Ex: Pix, Cartão, Dinheiro">
-        
+        <input type="text" id="pagamento">
         <label>Observações</label>
         <textarea id="obs" rows="2"></textarea>
     </div>
 
     <button class="btn-main" onclick="gerar()">GERAR ETIQUETA FINAL</button>
 
+    <!-- ÁREA DE RESULTADO -->
     <div id="resultArea" class="card">
         <h3 style="margin:0">Etiqueta Pronta!</h3>
+        
         <canvas id="canvas" style="display:none"></canvas>
         <img id="finalImg">
         
-        <button class="btn-whatsapp" onclick="compartilharNoWhatsapp()">
-            <span style="font-size:22px">📲</span> COMPARTILHAR NO WHATSAPP
+        <!-- BOTÃO DE WHATSAPP -->
+        <button type="button" class="btn-whatsapp" onclick="enviarWhats()">
+            <span style="font-size:24px">📲</span> ENVIAR NO WHATSAPP
         </button>
 
-        <div class="tip" style="margin-top:15px">👆 Ou <b>Segure o dedo na imagem</b> para salvar.</div>
-        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:20px; font-weight:bold">LIMPAR E NOVO</button>
+        <div class="tip">👆 <b>Toque no botão acima</b> para enviar ou segure na imagem para salvar.</div>
+        
+        <button onclick="location.reload()" style="background:none; border:none; color:#ff453a; margin-top:20px; font-weight:bold; width:100%;">❌ LIMPAR E NOVO</button>
     </div>
 
     <script>
@@ -190,12 +189,12 @@
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 800;
-                    canvas.height = (img.height * 800) / img.width;
-                    ctx.drawImage(img, 0, 0, 800, canvas.height);
-                    fotoData = canvas.toDataURL('image/jpeg', 0.8);
+                    const cv = document.createElement('canvas');
+                    const ctx = cv.getContext('2d');
+                    cv.width = 800;
+                    cv.height = (img.height * 800) / img.width;
+                    ctx.drawImage(img, 0, 0, 800, cv.height);
+                    fotoData = cv.toDataURL('image/jpeg', 0.8);
                     document.getElementById('previewImg').src = fotoData;
                     document.getElementById('previewImg').style.display = 'block';
                 }
@@ -212,7 +211,7 @@
             const imgN = new Image();
             
             imgN.onload = function() {
-                const hRodape = 650;
+                const hRodape = 680;
                 cv.width = 800;
                 cv.height = imgN.height + hRodape;
 
@@ -230,43 +229,33 @@
                 if(urgente) {
                     ctx.font = "bold 45px sans-serif";
                     ctx.fillText("🚨 ENTREGA URGENTE 🚨", 40, y);
-                    y += 70;
+                    y += 75;
                 }
 
                 ctx.font = "bold 35px sans-serif";
                 ctx.fillText("CLIENTE: " + document.getElementById('nome').value.toUpperCase(), 40, y);
                 y += 50;
-
-                if(document.getElementById('tel').value) {
-                    ctx.fillText("TEL: " + document.getElementById('tel').value, 40, y);
-                    y += 50;
-                }
-
-                if(document.getElementById('recebedor').value) {
-                    ctx.fillText("RECEBER: " + document.getElementById('recebedor').value.toUpperCase(), 40, y);
-                    y += 50;
-                }
-
+                ctx.fillText("TEL: " + document.getElementById('tel').value, 40, y);
+                y += 50;
+                ctx.fillText("RECEBER: " + document.getElementById('recebedor').value.toUpperCase(), 40, y);
+                y += 55;
                 ctx.font = "bold 32px sans-serif";
                 ctx.fillText("RUA: " + document.getElementById('rua').value.toUpperCase() + ", " + document.getElementById('num').value, 40, y);
                 y += 45;
                 ctx.fillText("BAIRRO: " + document.getElementById('bairro').value.toUpperCase(), 40, y);
-                y += 70;
+                y += 75;
 
                 ctx.fillStyle = urgente ? "yellow" : "#25D366";
-                ctx.font = "bold 40px sans-serif";
+                ctx.font = "bold 42px sans-serif";
                 ctx.fillText("⏰ HORÁRIO: " + document.getElementById('hora').value.toUpperCase(), 40, y);
-                y += 60;
+                y += 65;
 
                 ctx.fillStyle = "white";
                 ctx.font = "bold 35px sans-serif";
                 ctx.fillText("💳 PAGTO: " + document.getElementById('pagamento').value.toUpperCase(), 40, y);
-                y += 60;
-
-                if(document.getElementById('obs').value) {
-                    ctx.font = "italic 28px sans-serif";
-                    ctx.fillText("Obs: " + document.getElementById('obs').value, 40, y);
-                }
+                y += 65;
+                ctx.font = "italic 28px sans-serif";
+                ctx.fillText("Obs: " + document.getElementById('obs').value, 40, y);
 
                 document.getElementById('finalImg').src = cv.toDataURL('image/jpeg', 0.9);
                 document.getElementById('resultArea').style.display = 'block';
@@ -275,23 +264,20 @@
             imgN.src = fotoData;
         }
 
-        async function compartilharNoWhatsapp() {
+        async function enviarWhats() {
             const canvas = document.getElementById('canvas');
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], 'entrega.jpg', { type: 'image/jpeg' });
-                
                 if (navigator.share) {
                     try {
                         await navigator.share({
                             files: [file],
-                            title: 'Etiqueta de Entrega',
-                            text: 'Segue os dados da entrega:'
+                            title: 'Etiqueta',
+                            text: 'Dados da Entrega'
                         });
-                    } catch (error) {
-                        console.log('Erro ao compartilhar:', error);
-                    }
+                    } catch (err) { console.log(err); }
                 } else {
-                    alert("Seu navegador não suporta o botão de compartilhar. Segure na imagem para salvar e enviar.");
+                    alert("Seu navegador não suporta compartilhamento direto. Segure na imagem para salvar.");
                 }
             }, 'image/jpeg', 0.9);
         }
